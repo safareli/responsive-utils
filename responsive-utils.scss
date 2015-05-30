@@ -1,0 +1,59 @@
+@mixin respond-to($val, $query : min-width, $media : screen){
+  @media #{$media} and (#{$query}: #{$val}){
+    @content
+  }
+}
+
+@mixin util($selector, $prefix: ".u-", $responsivie: true){
+  #{$prefix}#{$selector}{
+    @content;
+  }
+  @if $responsivie {
+    @each $name, $width in $g-brake {
+      @include respond-to($width) {
+        #{$prefix}#{$name}-#{$selector} {
+          @content;
+        }
+      }
+    }    
+  }
+}
+
+@mixin utilsGenerator($utilNameProp, $values, $responsive: false, $seperator: "-"){  
+  @each $name, $props in $utilNameProp {
+    @each $valueName, $value in $values {
+      @include util(#{$name}#{$seperator}#{$valueName}, $responsivie:$responsive) {
+        @each $prop in $props {
+          #{$prop}: $value !important;
+        }
+      }
+    }
+  }
+}
+
+
+
+$g-brake-sm: 480px !default;
+$g-brake-md: 800px !default;
+$g-brake-lg: 1024px !default;
+
+$g-brake: (
+  sm: $g-brake-sm,
+  md: $g-brake-md,
+  lg: $g-brake-lg
+);
+
+
+@include utilsGenerator((
+  ml: (margin-left),
+  mr: (margin-right),
+  mt: (margin-top),
+  mb: (margin-bottom),
+  mh: (margin-left, margin-right),
+  mv: (margin-bottom, margin-top)
+), (
+  a: auto,
+  s: 5px,
+  m: 10px,
+  l: 20px
+), true)
